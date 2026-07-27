@@ -1,0 +1,20 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: nodara-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: nodara
+      POSTGRES_PASSWORD: nodara
+      POSTGRES_DB: nodara
+    ports:
+      - "5432:5432"
+    volumes:
+      - nodara_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nodara"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+volumes:
+  nodara_pg_data:

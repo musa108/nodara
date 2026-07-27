@@ -1,0 +1,77 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --font-sans: "Plus Jakarta Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+    /* RootData warm light theme colors */
+    --background: 38 30% 95%; /* #f5efe4 (warm sand/cream) */
+    --foreground: 30 12% 14%; /* #2b2723 (dark brown/charcoal) */
+    --card: 0 0% 100%; /* #ffffff */
+    --card-foreground: 30 12% 14%;
+    --border: 36 12% 88%; /* #e8e2d7 (warm soft border) */
+    --input: 36 12% 88%;
+    --ring: 14 76% 57%; /* #e6643c (terracotta primary) */
+    --primary: 14 76% 57%;
+    --primary-foreground: 38 30% 97%; /* soft light cream */
+    --secondary: 36 18% 90%; /* slightly darker cream */
+    --secondary-foreground: 30 12% 14%;
+    --muted: 36 18% 92%;
+    --muted-foreground: 30 8% 46%; /* warm gray/taupe */
+    --accent: 14 76% 94%; /* very light peach/orange */
+    --accent-foreground: 14 76% 40%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 142 60% 42%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 30 12% 14%;
+    --radius: 0.75rem; /* slightly rounder corners */
+  }
+
+  .dark {
+    /* Rich warm dark theme (like dark chocolate / deep terracotta) */
+    --background: 24 10% 8%; /* #191614 (deep charcoal brown) */
+    --foreground: 36 20% 92%; /* #faf7f5 (warm off-white) */
+    --card: 24 10% 11%; /* #211e1b */
+    --card-foreground: 36 20% 92%;
+    --border: 24 10% 18%; /* #312c29 */
+    --input: 24 10% 18%;
+    --ring: 14 76% 62%; /* brighter terracotta for dark mode */
+    --primary: 14 76% 62%;
+    --primary-foreground: 24 10% 8%;
+    --secondary: 24 10% 15%;
+    --secondary-foreground: 36 20% 92%;
+    --muted: 24 10% 15%;
+    --muted-foreground: 24 8% 60%;
+    --accent: 14 60% 20%; /* dark terracotta highlight */
+    --accent-foreground: 14 76% 80%;
+    --destructive: 0 63% 45%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 152 55% 45%;
+    --success-foreground: 24 10% 8%;
+    --warning: 38 92% 55%;
+    --warning-foreground: 24 10% 8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "cv11", "ss01";
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}

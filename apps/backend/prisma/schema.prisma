@@ -1,0 +1,255 @@
+// Nodara database schema — Postgres (Neon) via Prisma.
+// Trigger and Action are first-class rows (not JSON blobs on Workflow),
+// so each has its own audit trail and can be swapped independently of
+// the Workflow they belong to.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------
+// User & Wallet
+// ---------------------------------------------------------------------
+
+model User {
+  id        String   @id @default(cuid())
+  address   String   @unique
+  email     String?  @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  wallets       Wallet[]
+  notifications Notification[]
+  auditLogs     AuditLog[]
+
+  @@map("users")
+}
+
+model Wallet {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  address                String
+  chainId                Int
+  coldWalletAddress      String?
+  isPrimary              Boolean @default(false)
+  lastScannedBlock       BigInt  @default(0)
+  lastKnownNativeBalance String  @default("0")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  workflows Workflow[]
+  auditLogs AuditLog[]
+
+  @@unique([address, chainId])
+  @@index([userId])
+  @@map("wallets")
+}
+
+// ---------------------------------------------------------------------
+// Workflow, Trigger, Action
+// ---------------------------------------------------------------------
+
+enum WorkflowStatus {
+  ACTIVE
+  PAUSED
+  DRAFT
+}
+
+enum TriggerType {
+  MANUAL
+  SCHEDULE
+  WALLET_RECEIVES_FUNDS
+  TOKEN_APPROVAL_DETECTED
+}
+
+enum ActionType {
+  TRANSFER_TOKENS
+  SWAP_TOKENS
+  REVOKE_APPROVAL
+}
+
+model Workflow {
+  id          String         @id @default(cuid())
+  walletId    String
+  wallet      Wallet         @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  name        String
+  description String?
+  status      WorkflowStatus @default(DRAFT)
+  enabled     Boolean        @default(true)
+
+  lastEvaluatedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  trigger    Trigger?
+  action     Action?
+  executions Execution[]
+  auditLogs  AuditLog[]
+
+  @@index([walletId])
+  @@index([enabled, status])
+  @@map("workflows")
+}
+
+model Trigger {
+  id         String      @id @default(cuid())
+  workflowId String      @unique
+  workflow   Workflow    @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  type       TriggerType
+
+  config     Json
+
+  conditionConfig Json
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("triggers")
+}
+
+model Action {
+  id         String     @id @default(cuid())
+  workflowId String     @unique
+  workflow   Workflow   @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  type       ActionType
+
+  config     Json
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("actions")
+}
+
+// ---------------------------------------------------------------------
+// Execution
+// ---------------------------------------------------------------------
+
+enum ExecutionStatus {
+  PENDING
+  SIMULATING
+  SIMULATION_FAILED
+  ESTIMATING_GAS
+  SUBMITTED
+  CONFIRMED
+  FAILED
+  RETRYING
+}
+
+model Execution {
+  id         String   @id @default(cuid())
+  workflowId String
+  workflow   Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+
+  status ExecutionStatus @default(PENDING)
+
+  triggerSnapshot   Json?
+  simulationResult  Json?
+  gasEstimate       Json?
+  unsignedTx        Json?
+
+  transactionHash   String?
+  keeperHubJobId    String?
+  blockNumber       BigInt?
+  gasUsed           String?
+  effectiveGasPrice String?
+
+  errorMessage String?
+  attempt      Int     @default(1)
+  idempotencyKey String @unique
+
+  
+  durationMs Int?
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  confirmedAt DateTime?
+
+  auditLogs     AuditLog[]
+  notifications Notification[]
+
+  @@index([workflowId])
+  @@index([status])
+  @@map("executions")
+}
+
+// ---------------------------------------------------------------------
+// Notification
+// ---------------------------------------------------------------------
+
+enum NotificationType {
+  WORKFLOW_TRIGGERED
+  EXECUTION_CONFIRMED
+  EXECUTION_FAILED
+  APPROVAL_DETECTED
+  SYSTEM
+}
+
+model Notification {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  executionId String?
+  execution   Execution? @relation(fields: [executionId], references: [id], onDelete: SetNull)
+
+  type    NotificationType
+  title   String
+  message String
+  read    Boolean @default(false)
+
+  createdAt DateTime @default(now())
+
+  @@index([userId, read])
+  @@map("notifications")
+}
+
+// ---------------------------------------------------------------------
+// AuditLog (append-only)
+// ---------------------------------------------------------------------
+
+enum AuditEventType {
+  WORKFLOW_CREATED
+  WORKFLOW_UPDATED
+  WORKFLOW_DELETED
+  WORKFLOW_ENABLED
+  WORKFLOW_DISABLED
+  EXECUTION_STARTED
+  EXECUTION_SUCCEEDED
+  EXECUTION_FAILED
+  RETRY_ATTEMPT
+  WALLET_CONNECTED
+}
+
+model AuditLog {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  walletId String?
+  wallet   Wallet? @relation(fields: [walletId], references: [id], onDelete: SetNull)
+
+  workflowId String?
+  workflow   Workflow? @relation(fields: [workflowId], references: [id], onDelete: SetNull)
+
+  executionId String?
+  execution   Execution? @relation(fields: [executionId], references: [id], onDelete: SetNull)
+
+  eventType AuditEventType
+  metadata  Json?
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([eventType])
+  @@map("audit_logs")
+}
