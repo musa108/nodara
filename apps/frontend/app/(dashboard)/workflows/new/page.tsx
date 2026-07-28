@@ -43,6 +43,7 @@ export default function NewWorkflowPage() {
 
   // Trigger config fields
   const [cronExpression, setCronExpression] = useState("0 10 * * FRI");
+  const [timezone, setTimezone] = useState("Africa/Lagos");
   const [receivesTokenAddress, setReceivesTokenAddress] = useState("NATIVE");
   const [approvalTokenAddress, setApprovalTokenAddress] = useState("");
 
@@ -63,7 +64,7 @@ export default function NewWorkflowPage() {
   const [swapTo, setSwapTo] = useState("");
   const [swapAmount, setSwapAmount] = useState("10");
 
-  
+
 
 
   const primaryWallet =
@@ -83,7 +84,7 @@ export default function NewWorkflowPage() {
   function buildTriggerConfig() {
     switch (triggerType) {
       case TriggerType.SCHEDULE:
-        return { type: TriggerType.SCHEDULE, cronExpression, timezone: "UTC" } as const;
+        return { type: TriggerType.SCHEDULE, cronExpression, timezone } as const;
       case TriggerType.WALLET_RECEIVES_FUNDS:
         return { type: TriggerType.WALLET_RECEIVES_FUNDS, tokenAddress: receivesTokenAddress } as const;
       case TriggerType.TOKEN_APPROVAL_DETECTED:
@@ -203,9 +204,21 @@ export default function NewWorkflowPage() {
           <Card className="border border-border/40 shadow-premium rounded-2xl overflow-hidden bg-card">
             <CardContent className="space-y-5 pt-6">
               {triggerType === TriggerType.SCHEDULE && (
-                <Field label="Cron expression (UTC)">
-                  <Input value={cronExpression} onChange={setCronExpression} placeholder="0 10 * * FRI" />
-                </Field>
+                <>
+                  <Field label="Timezone">
+                    <Select
+                      value={timezone}
+                      onChange={setTimezone}
+                      options={[
+                        { value: "Africa/Lagos", label: "Africa/Lagos (WAT)" },
+                        { value: "UTC", label: "UTC" },
+                      ]}
+                    />
+                  </Field>
+                  <Field label={`Cron expression (${timezone})`}>
+                    <Input value={cronExpression} onChange={setCronExpression} placeholder="40 14 * * *" />
+                  </Field>
+                </>
               )}
               {triggerType === TriggerType.WALLET_RECEIVES_FUNDS && (
                 <>
