@@ -23,9 +23,13 @@ export const executionRepository = {
     return prisma.execution.findUnique({ where: { idempotencyKey } });
   },
 
-  findById(id: string): Promise<Execution | null> {
-    return prisma.execution.findUnique({ where: { id } });
-  },
+  
+  findById(id: string): Promise<(Execution & { workflow: { name: string } }) | null> {
+  return prisma.execution.findUnique({
+    where: { id },
+    include: { workflow: { select: { name: true } } },
+  });
+},
 
   update(id: string, data: Prisma.ExecutionUpdateInput): Promise<Execution> {
     return prisma.execution.update({ where: { id }, data });

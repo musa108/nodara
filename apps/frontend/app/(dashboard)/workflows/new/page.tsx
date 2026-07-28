@@ -9,6 +9,7 @@ import { useCreateWorkflow } from "@/hooks/useWorkflows";
 import { useWallets } from "@/hooks/useWallets";
 import { TriggerType, ActionType, type CreateWorkflowInput } from "@nodara/shared";
 import { cn } from "@/utils/cn";
+import { useAccount } from "wagmi";
 
 type Step = "trigger" | "configure-trigger" | "action" | "configure-action" | "review";
 
@@ -31,6 +32,8 @@ export default function NewWorkflowPage() {
   const router = useRouter();
   const { data: wallets } = useWallets();
   const createWorkflow = useCreateWorkflow();
+  const { chainId } = useAccount();
+
 
   const [step, setStep] = useState<Step>("trigger");
   const [name, setName] = useState("");
@@ -60,7 +63,13 @@ export default function NewWorkflowPage() {
   const [swapTo, setSwapTo] = useState("");
   const [swapAmount, setSwapAmount] = useState("10");
 
-  const primaryWallet = wallets?.find((w) => w.isPrimary) ?? wallets?.[0];
+  
+
+
+  const primaryWallet =
+    wallets?.find((w) => w.chainId === chainId) ??
+    wallets?.find((w) => w.isPrimary) ??
+    wallets?.[0];
 
   function goNext() {
     const idx = STEP_ORDER.indexOf(step);
@@ -317,11 +326,11 @@ export default function NewWorkflowPage() {
               <Field label="Description (optional)">
                 <Input value={description} onChange={setDescription} placeholder="What does this workflow do?" />
               </Field>
-              
+
               <div className="rounded-xl border border-border/40 bg-muted/20 p-4.5 text-xs font-semibold text-muted-foreground/95 space-y-2">
                 <p className="flex justify-between items-center pb-2 border-b border-border/30">
                   <span>Trigger Configuration</span>
-                  <span className="text-foreground bg-primary/10 text-primary border border-primary/20 px-2 py-0.5 rounded font-bold uppercase text-[10px]">
+                  <span className="bg-primary/10 text-primary border border-primary/20 px-2 py-0.5 rounded font-bold uppercase text-[10px]">
                     {triggerType?.replaceAll("_", " ")}
                   </span>
                 </p>
@@ -331,13 +340,15 @@ export default function NewWorkflowPage() {
                     {actionType?.replaceAll("_", " ")}
                   </span>
                 </p>
-                {!primaryWallet && (
-                  <p className="mt-3 text-center text-warning bg-warning/5 border border-warning/10 p-2.5 rounded-lg font-bold">
-                    No wallet connected — connect a wallet in the header before saving.
+                {!primaryWallet && <p className="mt-2 text-warning">No wallet connected — connect a wallet before saving.</p>}
+                {primaryWallet && primaryWallet.chainId !== chainId && (
+                  <p className="mt-2 text-warning">
+                    This workflow will be created on chain {primaryWallet.chainId}, which doesn't match your
+                    currently connected network ({chainId}). Switch networks or sign in again on this chain.
                   </p>
                 )}
               </div>
-              
+
               <Button
                 onClick={handleSave}
                 disabled={!primaryWallet || createWorkflow.isPending}
