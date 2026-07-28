@@ -13,6 +13,14 @@ export function useAuth() {
   const { token, wallet, setSession, clearSession } = useAuthStore();
   const [isAuthenticating, setIsAuthenticating] = useState(false);
 
+  // A session is only valid for the chain it was issued on. Switching
+  // networks in the wallet doesn't invalidate the stored token, but the
+  // Wallet row that token maps to is chain-specific — so if the
+  // currently-connected chain doesn't match the wallet the session was
+  // created for, treat this as "not authenticated" until the user signs
+  // in again on the new chain.
+  const isAuthenticated = Boolean(token) && wallet?.chainId === chainId;
+
   const signIn = useCallback(async () => {
     if (!address || !chainId) {
       toast.error("Connect a wallet first");
@@ -52,7 +60,7 @@ export function useAuth() {
 
   return {
     isConnected,
-    isAuthenticated: Boolean(token),
+    isAuthenticated,
     isAuthenticating,
     wallet,
     signIn,
