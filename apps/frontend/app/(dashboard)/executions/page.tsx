@@ -9,6 +9,7 @@ import { TableSkeleton } from "@/components/dashboard/skeletons";
 import { ExecutionStatusBadge } from "@/components/dashboard/status-badge";
 import { useExecutions } from "@/hooks/useExecutions";
 import { format } from "date-fns";
+import { getTxExplorerUrl } from "@/utils/explorer";
 
 export default function ExecutionsPage() {
   const [page, setPage] = useState(1);
@@ -54,18 +55,20 @@ export default function ExecutionsPage() {
                       <td className="px-6 py-4.5">
                         <ExecutionStatusBadge status={e.status} />
                       </td>
-                      <td className="px-6 py-4.5 font-mono text-2xs text-muted-foreground">
+                      <td className="px-4 py-3 font-mono text-xs">
                         {e.transactionHash ? (
-                          <a
-                            href={`https://etherscan.io/tx/${e.transactionHash}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="hover:text-primary hover:underline transition-colors"
-                          >
-                            {`${e.transactionHash.slice(0, 8)}…${e.transactionHash.slice(-8)}`}
-                          </a>
+                          (() => {
+                            const url = getTxExplorerUrl(e.chainId, e.transactionHash!);
+                            return url ? (
+                              <a href={url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                                {e.transactionHash.slice(0, 10)}…
+                              </a>
+                            ) : (
+                              <span className="text-muted-foreground">{e.transactionHash.slice(0, 10)}…</span>
+                            );
+                          })()
                         ) : (
-                          "—"
+                          <span className="text-muted-foreground">—</span>
                         )}
                       </td>
                       <td className="px-6 py-4.5 text-muted-foreground font-semibold">

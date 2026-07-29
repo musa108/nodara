@@ -14,11 +14,12 @@ import type { Execution, Prisma } from "@prisma/client";
 
 const log = createModuleLogger("execution-service");
 
-function toDTO(execution: Execution & { workflow?: { name: string } }): ExecutionDTO {
+function toDTO(execution: Execution & { workflow?: { name: string; wallet?: { chainId: number } } }): ExecutionDTO {
   return {
     id: execution.id,
     workflowId: execution.workflowId,
     workflowName: execution.workflow?.name ?? "",
+    chainId: execution.workflow?.wallet?.chainId ?? 0,
     status: execution.status,
     triggerSnapshot: execution.triggerSnapshot,
     simulationResult: execution.simulationResult,

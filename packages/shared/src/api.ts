@@ -46,6 +46,7 @@ export interface ExecutionDTO {
   id: string;
   workflowId: string;
   workflowName: string;
+  chainId: number;
   status: ExecutionStatus;
   triggerSnapshot: unknown;
   simulationResult: unknown;

@@ -24,10 +24,10 @@ export const executionRepository = {
   },
 
   
-  findById(id: string): Promise<(Execution & { workflow: { name: string } }) | null> {
+findById(id: string) {
   return prisma.execution.findUnique({
     where: { id },
-    include: { workflow: { select: { name: true } } },
+    include: { workflow: { select: { name: true, wallet: { select: { chainId: true } } } } },
   });
 },
 
@@ -35,18 +35,18 @@ export const executionRepository = {
     return prisma.execution.update({ where: { id }, data });
   },
 
-  findManyForWorkflows(
-    workflowIds: string[],
-    params: { skip: number; take: number; status?: ExecutionStatus }
-  ): Promise<(Execution & { workflow: { name: string } })[]> {
-    return prisma.execution.findMany({
-      where: { workflowId: { in: workflowIds }, status: params.status },
-      include: { workflow: { select: { name: true } } },
-      orderBy: { createdAt: "desc" },
-      skip: params.skip,
-      take: params.take,
-    });
-  },
+findManyForWorkflows(
+  workflowIds: string[],
+  params: { skip: number; take: number; status?: ExecutionStatus }
+) {
+  return prisma.execution.findMany({
+    where: { workflowId: { in: workflowIds }, status: params.status },
+    include: { workflow: { select: { name: true, wallet: { select: { chainId: true } } } } },
+    orderBy: { createdAt: "desc" },
+    skip: params.skip,
+    take: params.take,
+  });
+},
 
   countForWorkflows(workflowIds: string[], status?: ExecutionStatus): Promise<number> {
     return prisma.execution.count({ where: { workflowId: { in: workflowIds }, status } });
