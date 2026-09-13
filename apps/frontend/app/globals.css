@@ -1,0 +1,89 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+    /* Light-mode fallback. Nodara is dark-first by design — see .dark below. */
+    --background: 0 0% 100%;
+    --foreground: 240 10% 4%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 4%;
+    --border: 240 6% 90%;
+    --input: 240 6% 90%;
+    --ring: 255 92% 65%;
+    --primary: 255 92% 65%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 5% 96%;
+    --secondary-foreground: 240 10% 4%;
+    --muted: 240 5% 96%;
+    --muted-foreground: 240 4% 46%;
+    --accent: 240 5% 96%;
+    --accent-foreground: 240 10% 4%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 152 60% 42%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 240 10% 4%;
+    --radius: 0.625rem;
+  }
+
+  .dark {
+    /* Near-black graphite, not navy — deliberately neutral so the single
+       violet accent reads clearly (Linear/Vercel direction). This is
+       Nodara's actual brand palette, consistent across the product,
+       pitch deck, and docs. */
+    --background: 240 8% 6%;
+    --foreground: 240 8% 96%;
+    --card: 240 7% 9%;
+    --card-foreground: 240 8% 96%;
+    --border: 240 6% 16%;
+    --input: 240 6% 16%;
+    --ring: 255 92% 68%;
+    --primary: 255 92% 68%;
+    --primary-foreground: 240 8% 6%;
+    --secondary: 240 6% 14%;
+    --secondary-foreground: 240 8% 96%;
+    --muted: 240 6% 14%;
+    --muted-foreground: 240 5% 60%;
+    --accent: 240 6% 14%;
+    --accent-foreground: 240 8% 96%;
+    --destructive: 0 63% 45%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 152 55% 45%;
+    --success-foreground: 240 8% 6%;
+    --warning: 38 92% 55%;
+    --warning-foreground: 240 8% 6%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "cv11", "ss01", "tnum";
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Faint fixed grid backdrop used sparingly behind hero/empty-state
+   sections — never behind dense data views. */
+.bg-grid {
+  background-image:
+    linear-gradient(to right, hsl(var(--border) / 0.4) 1px, transparent 1px),
+    linear-gradient(to bottom, hsl(var(--border) / 0.4) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
