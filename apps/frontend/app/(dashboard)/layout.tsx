@@ -23,13 +23,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <div className="flex min-h-screen bg-[#FBF9F5]">
-      <div className="hidden lg:block">
+    <div className="flex h-screen h-[100dvh] overflow-hidden bg-[#FBF9F5]">
+      {/* Fixed desktop sidebar */}
+      <div className="hidden lg:flex lg:h-full lg:w-64 lg:shrink-0">
         <Sidebar />
       </div>
 
-      <div className="flex flex-1 flex-col">
-        <header className="flex h-16 items-center justify-between gap-3 border-b border-[#E6E1D8] bg-[#FBF9F5]/90 px-4 backdrop-blur-md sm:px-6">
+      {/* Scrollable dashboard content container */}
+      <div className="flex flex-1 flex-col h-full min-w-0 overflow-y-auto">
+        <header className="sticky top-0 z-20 flex h-16 shrink-0 items-center justify-between gap-3 border-b border-[#E6E1D8] bg-[#FBF9F5]/90 px-4 backdrop-blur-md sm:px-6">
           <button
             onClick={() => setMobileMenuOpen((v) => !v)}
             className="rounded-lg p-2 text-[#6F6A63] hover:bg-[#F3EFE8] hover:text-[#1B1A18] lg:hidden"
@@ -42,7 +44,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </header>
 
         {mobileMenuOpen && (
-          <nav className="flex flex-wrap gap-1.5 border-b border-[#E6E1D8] bg-[#FAF8F4] px-4 py-3 lg:hidden">
+          <nav className="flex shrink-0 flex-wrap gap-1.5 border-b border-[#E6E1D8] bg-[#FAF8F4] px-4 py-3 lg:hidden">
             {NAV_ITEMS.map((item) => {
               const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
               return (

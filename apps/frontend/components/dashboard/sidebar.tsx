@@ -18,9 +18,9 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="flex h-screen w-64 flex-col border-r border-[#E6E1D8] bg-[#FAF8F4]">
+    <aside className="flex h-full w-64 flex-col border-r border-[#E6E1D8] bg-[#FAF8F4] select-none">
       {/* Brand header */}
-      <Link href="/" className="flex items-center gap-2.5 px-6 py-5.5 border-b border-[#E6E1D8]/60">
+      <Link href="/" className="flex shrink-0 items-center gap-2.5 px-6 py-5.5 border-b border-[#E6E1D8]/60">
         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#E0533C] text-white font-bold text-base shadow-sm">
           ✱
         </div>
@@ -31,7 +31,7 @@ export function Sidebar() {
       </Link>
 
       {/* Nav items */}
-      <nav className="flex-1 space-y-1 px-3 py-4">
+      <nav className="flex-1 space-y-1 px-3 py-4 overflow-y-auto">
         {NAV_ITEMS.map((item) => {
           const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
           const Icon = item.icon;
@@ -59,7 +59,7 @@ export function Sidebar() {
       </nav>
 
       {/* Status footer */}
-      <div className="border-t border-[#E6E1D8] p-4">
+      <div className="shrink-0 border-t border-[#E6E1D8] p-4">
         <div className="rounded-xl border border-[#E6E1D8] bg-[#F3EFE8]/70 p-3 text-left">
           <div className="flex items-center gap-2">
             <span className="relative flex h-2 w-2">
