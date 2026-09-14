@@ -23,16 +23,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen bg-[#FBF9F5]">
       <div className="hidden lg:block">
         <Sidebar />
       </div>
 
       <div className="flex flex-1 flex-col">
-        <header className="flex h-16 items-center justify-between gap-3 border-b border-border px-4 sm:px-6">
+        <header className="flex h-16 items-center justify-between gap-3 border-b border-[#E6E1D8] bg-[#FBF9F5]/90 px-4 backdrop-blur-md sm:px-6">
           <button
             onClick={() => setMobileMenuOpen((v) => !v)}
-            className="rounded-md p-2 text-muted-foreground hover:bg-secondary hover:text-foreground lg:hidden"
+            className="rounded-lg p-2 text-[#6F6A63] hover:bg-[#F3EFE8] hover:text-[#1B1A18] lg:hidden"
             aria-label="Toggle menu"
           >
             {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -42,7 +42,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </header>
 
         {mobileMenuOpen && (
-          <nav className="flex flex-wrap gap-1.5 border-b border-border px-4 py-3 lg:hidden">
+          <nav className="flex flex-wrap gap-1.5 border-b border-[#E6E1D8] bg-[#FAF8F4] px-4 py-3 lg:hidden">
             {NAV_ITEMS.map((item) => {
               const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
               return (
@@ -51,8 +51,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   href={item.href}
                   onClick={() => setMobileMenuOpen(false)}
                   className={cn(
-                    "rounded-md px-3 py-1.5 text-sm",
-                    isActive ? "bg-secondary text-foreground" : "text-muted-foreground hover:bg-secondary/60"
+                    "rounded-lg px-3 py-1.5 text-sm font-medium transition-colors",
+                    isActive ? "bg-[#F3EFE8] text-[#1B1A18] font-semibold" : "text-[#6F6A63] hover:bg-[#F3EFE8]/70 hover:text-[#1B1A18]"
                   )}
                 >
                   {item.label}
@@ -62,7 +62,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </nav>
         )}
 
-        <main className="flex flex-1 flex-col p-4 sm:p-6">
+        <main className="flex flex-1 flex-col p-4 sm:p-6 lg:p-8">
           <AuthGate>{children}</AuthGate>
         </main>
       </div>
