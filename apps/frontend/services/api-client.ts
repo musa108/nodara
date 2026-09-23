@@ -34,6 +34,10 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
 
   const json = (await response.json()) as ApiResponse<T>;
 
+  if (response.status === 401 && options.auth !== false) {
+    useAuthStore.getState().clearSession();
+  }
+
   if (!json.success) {
     throw new ApiClientError(json.error.code, json.error.message, json.error.details);
   }
