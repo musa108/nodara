@@ -1,8 +1,38 @@
 "use client";
 
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { createJSONStorage, persist } from "zustand/middleware";
 import type { WalletDTO } from "@nodara/shared";
+
+const safeStorage = {
+  getItem: (name: string) => {
+    if (typeof window === "undefined") return null;
+
+    try {
+      return window.localStorage.getItem(name);
+    } catch {
+      return null;
+    }
+  },
+  setItem: (name: string, value: string) => {
+    if (typeof window === "undefined") return;
+
+    try {
+      window.localStorage.setItem(name, value);
+    } catch {
+      // Ignore storage quota/security errors in restricted browsers.
+    }
+  },
+  removeItem: (name: string) => {
+    if (typeof window === "undefined") return;
+
+    try {
+      window.localStorage.removeItem(name);
+    } catch {
+      // Ignore storage security errors.
+    }
+  },
+};
 
 interface AuthState {
   token: string | null;
@@ -19,6 +49,9 @@ export const useAuthStore = create<AuthState>()(
       setSession: (token, wallet) => set({ token, wallet }),
       clearSession: () => set({ token: null, wallet: null }),
     }),
-    { name: "nodara-auth" }
+    {
+      name: "nodara-auth",
+      storage: createJSONStorage(() => safeStorage),
+    }
   )
 );
